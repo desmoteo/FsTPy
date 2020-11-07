@@ -1,0 +1,50 @@
+#!python
+import os
+import begin
+from pyftpdlib.handlers import TLS_FTPHandler
+from pyftpdlib.servers import FTPServer
+from fstpy.authorizers import DummyAuthorizer, MD5Authorizer
+from fstpy.filesystems import AbstractedFS
+
+@begin.start
+@begin.convert(port=int)
+def main(fs, address=os.getenv('FSTPY_HOST', ''), port=os.getenv('FSTPY_PORT', 2121), 
+             credentials=os.getenv('FSTPY_CREDENTIALS', 'credentials.txt'), 
+             keyfile=os.getenv('FSTPY_KEYFILE', 'server.key'), 
+             crtfile=os.getenv('FSTPY_CRTFILE', 'server.crt'), 
+             banner=os.getenv('FSTPY_BANNER', 'FsTPy based ftpd ready.')):
+    # Instantiate a dummy authorizer for managing 'virtual' users
+    authorizer = MD5Authorizer(fs, credentials)
+
+    
+    # Define a new user having full r/w permissions and a read-only
+    # anonymous user
+    #authorizer.add_user('user', '***', '/' , perm='elradfmwMT')
+    #authorizer.add_anonymous(os.getcwd())
+
+    # Instantiate FTP handler class
+    handler = TLS_FTPHandler
+    handler.abstracted_fs = AbstractedFS
+    handler.certfile =  crtfile
+    handler.keyfile = keyfile
+    handler.authorizer = authorizer
+
+    # Define a customized banner (string returned when client connects)
+    handler.banner = banner
+
+    # Specify a masquerade address and the range of ports to use for
+    # passive connections.  Decomment in case you're behind a NAT.
+    #handler.masquerade_address = '151.25.42.11'
+    #handler.passive_ports = range(60000, 65535)
+
+    # Instantiate FTP server class and listen on address:port
+    server_address = (address, port)
+    server = FTPServer(server_address, handler)
+
+    # set a limit for connections
+    server.max_cons = 256
+    server.max_cons_per_ip = 5
+
+    # start ftp server
+    server.serve_forever()
+
