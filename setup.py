@@ -19,6 +19,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     scripts=['scripts/fstpyd'],
     install_requires=[
+        'pyopenssl'
         'fs',
         'pyftpdlib',
         'begins',
