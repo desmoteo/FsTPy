@@ -7,8 +7,11 @@ from fstpy.authorizers import DummyAuthorizer, MD5Authorizer
 from fstpy.filesystems import AbstractedFS
 
 @begin.start
-@begin.convert(port=int)
-def main(fs, address=os.getenv('FSTPY_HOST', ''), port=os.getenv('FSTPY_PORT', 2121), 
+@begin.convert(port=int, passive_ports_lower=int, passive_ports_upper=int)
+def main(fs, address=os.getenv('FSTPY_HOST', ''), port=os.getenv('FSTPY_PORT', 2121),
+             masquerade=os.getenv('FSTPY_MASQUERADE', None),
+             passive_ports_lower=os.getenv('FSTPY_PASSIVE_LOWER', 60200),
+             passive_ports_upper=os.getenv('FSTPY_PASSIVE_UPPER', 60210),
              credentials=os.getenv('FSTPY_CREDENTIALS', 'credentials.txt'), 
              keyfile=os.getenv('FSTPY_KEYFILE', 'server.key'), 
              crtfile=os.getenv('FSTPY_CRTFILE', 'server.crt'), 
@@ -34,8 +37,9 @@ def main(fs, address=os.getenv('FSTPY_HOST', ''), port=os.getenv('FSTPY_PORT', 2
 
     # Specify a masquerade address and the range of ports to use for
     # passive connections.  Decomment in case you're behind a NAT.
-    #handler.masquerade_address = '151.25.42.11'
-    #handler.passive_ports = range(60000, 65535)
+    if masquerade:
+        handler.masquerade_address = masquerade
+    handler.passive_ports = range(passive_ports_lower, passive_ports_upper)
 
     # Instantiate FTP server class and listen on address:port
     server_address = (address, port)
