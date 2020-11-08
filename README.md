@@ -88,4 +88,32 @@ fstpyd 'osfs://path/to/rootdir/'
 
 The API is pretty simple. It extends some classes of the pyftpdlib library (https://github.com/giampaolo/pyftpdlib). The fstpyd script (https://github.com/desmoteo/FsTPy/blob/main/scripts/fstpyd) can be used to understand basic usage, in combination with the rich documentation of pyftpdlib (https://pyftpdlib.readthedocs.io/en/latest/index.html) and PyFilesystem2 (https://docs.pyfilesystem.org/en/latest/index.html)
 
+There are just a couple of differences with respect to the original pyftpdlib.
+
+### Authorizers
+
+The authorizers from fstpy.authorizers, DummyAuthorizer and MD5Authorizer repalce the corresponfing classes of pyftpdlib.
+They take two arguments , the URL of the filesystem in PyFilesystem2 format, and the path to the credentials file. 
+
+DummyAuthorizer expects a credentials file with plain passwords.
+MD5Authorizer expects a credentials file with MD5 hashes of the passwords.
+
+```python
+from fstpy.authorizers import MD5Authorizer
+
+authorizer = MD5Authorizer('s3://my-bucket', 'credentials.txt')
+```
+
+### Abstraced Filesystem 
+
+FsTPy Abstracted filesystem in fstpy.filesystems should replace the native abstracted_fs of pyftpdlib handlers
+
+```python
+from fstpy.filesystems import AbstractedFS
+from pyftpdlib.handlers import TLS_FTPHandler
+
+handler = TLS_FTPHandler
+handler.abstracted_fs = AbstractedFS
+```
+
 
