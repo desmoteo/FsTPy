@@ -1,4 +1,7 @@
 # FsTPy
+Bridging FTP servers and cloud storage.
+
+
 FsTPy brings together the power and scalability of pyftpdlib (https://github.com/giampaolo/pyftpdlib) with the flexibility and abstraction provided by PyFilesystem2 (https://github.com/PyFilesystem/pyfilesystem2).
 
 It allows to build custom FTP and FTPS servers on abstracted filesystem (local or cloud such as S3 or Dropbox or Google Drive)
