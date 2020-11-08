@@ -58,6 +58,14 @@ Write permissions:
 
 ### Running the server
 Once installed, the server can be run simply by providing the PyFilesystem2 URL of the desired filesystem .
+
+The server binds to 0.0.0.0:2121. See help to change the address and port arguments:
+```bash
+fstpyd --help
+```
+
+#### Running an S3 backed server
+
 In order to start an S3 backed FTPS server on bucket my-bucket:
 
 1. Install S3 extension for PyFilesysytem2:
@@ -66,13 +74,16 @@ pip3 install fs-s3fs
 ```
 2. Run the server on the desired S3 bucket:
 ```bash
-fstpyd 's3://my-bucket/'
+fstpyd 's3://AWS_ACCESS_KEY_ID:AWS_SECRET_ACCESS_KEY@my-bucket/'
 ```
 
-The server binds to 0.0.0.0:2121. See help to change the address and port arguments:
+#### Running a server on local storage
+
+Run the server on a given root directory:
 ```bash
-fstpyd --help
+fstpyd 'osfs://path/to/rootdir/'
 ```
+
 ## APIs
 
 The API is pretty simple. It extends some classes of the pyftpdlib library (https://github.com/giampaolo/pyftpdlib). The fstpyd script (https://github.com/desmoteo/FsTPy/blob/main/scripts/fstpyd) can be used to understand basic usage, in combination with the rich documentation of pyftpdlib (https://pyftpdlib.readthedocs.io/en/latest/index.html) and PyFilesystem2 (https://docs.pyfilesystem.org/en/latest/index.html)
