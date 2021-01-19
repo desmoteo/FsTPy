@@ -8,7 +8,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setuptools.setup(
     name="fstpy",
-    version="0.0.8",
+    version="0.1.0",
     author="Matteo Ferrabone",
     author_email="matteo.ferrabone@gmail.com",
     license='MIT',
