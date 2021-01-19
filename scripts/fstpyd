@@ -6,6 +6,56 @@ from pyftpdlib.servers import FTPServer
 from fstpy.authorizers import DummyAuthorizer, MD5Authorizer
 from fstpy.filesystems import AbstractedFS
 
+
+
+def Pub_TLS_FTPHandler_Factory(port):
+    import zmq
+
+    context = zmq.Context()
+    socket = context.socket(zmq.PUB)
+    socket.bind("tcp://*:{0}".format(port))
+
+    class Pub_TLS_FTPHandler(TLS_FTPHandler):
+
+
+
+        def on_connect(self):
+            print ("{0}:{1} connected".format(self.remote_ip, self.remote_port))
+
+        def on_disconnect(self):
+            # do something when client disconnects
+            pass
+
+        def on_login(self, username):
+            # do something when user login
+            pass
+
+        def on_logout(self, username):
+            # do something when user logs out
+            pass
+
+        def on_file_sent(self, file):
+            # do something when a file has been sent
+            pass
+
+        def on_file_received(self, file):
+            # do something when a file has been received
+            print('Received: {0}'.format(file))
+            channel = file.split('/')[1]
+            socket.send_string('{0} {1}'.format(channel, file))
+            pass
+
+        def on_incomplete_file_sent(self, file):
+            # do something when a file is partially sent
+            pass
+
+        def on_incomplete_file_received(self, file):
+            # remove partially uploaded files
+            import os
+            os.remove(file)
+    
+    return Pub_TLS_FTPHandler
+
 @begin.start
 @begin.convert(port=int, passive_ports_lower=int, passive_ports_upper=int)
 def main(fs, address=os.getenv('FSTPY_HOST', ''), port=os.getenv('FSTPY_PORT', 2121),
@@ -14,7 +64,8 @@ def main(fs, address=os.getenv('FSTPY_HOST', ''), port=os.getenv('FSTPY_PORT', 2
              passive_ports_upper=os.getenv('FSTPY_PASSIVE_UPPER', 60210),
              credentials=os.getenv('FSTPY_CREDENTIALS', 'credentials.txt'), 
              keyfile=os.getenv('FSTPY_KEYFILE', 'server.key'), 
-             crtfile=os.getenv('FSTPY_CRTFILE', 'server.crt'), 
+             crtfile=os.getenv('FSTPY_CRTFILE', 'server.crt'),
+             pubport=os.getenv('FSTPY_PUBPORT', None),
              banner=os.getenv('FSTPY_BANNER', 'FsTPy based ftpd ready.')):
     # Instantiate a dummy authorizer for managing 'virtual' users
     authorizer = MD5Authorizer(fs, credentials)
@@ -26,7 +77,7 @@ def main(fs, address=os.getenv('FSTPY_HOST', ''), port=os.getenv('FSTPY_PORT', 2
     #authorizer.add_anonymous(os.getcwd())
 
     # Instantiate FTP handler class
-    handler = TLS_FTPHandler
+    handler = Pub_TLS_FTPHandler_Factory(pubport) if pubport else TLS_FTPHandler
     handler.abstracted_fs = AbstractedFS
     handler.certfile =  crtfile
     handler.keyfile = keyfile

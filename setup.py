@@ -23,6 +23,7 @@ setuptools.setup(
         'fs',
         'pyftpdlib',
         'begins',
+        'zmq',
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
