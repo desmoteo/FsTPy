@@ -2,7 +2,7 @@
 import os
 import begin
 from pyftpdlib.handlers import TLS_FTPHandler
-from pyftpdlib.servers import FTPServer
+from pyftpdlib.servers import MultiprocessFTPServer as FTPServer
 from fstpy.authorizers import DummyAuthorizer, MD5Authorizer
 from fstpy.filesystems import AbstractedFS
 
@@ -51,8 +51,9 @@ def Pub_TLS_FTPHandler_Factory(port):
 
         def on_incomplete_file_received(self, file):
             # remove partially uploaded files
-            import os
-            os.remove(file)
+            #import os
+            #os.remove(file)
+            pass
     
     return Pub_TLS_FTPHandler
 
@@ -97,8 +98,8 @@ def main(fs, address=os.getenv('FSTPY_HOST', ''), port=os.getenv('FSTPY_PORT', 2
     server = FTPServer(server_address, handler)
 
     # set a limit for connections
-    server.max_cons = 256
-    server.max_cons_per_ip = 5
+    server.max_cons = 512 
+    server.max_cons_per_ip = 25
 
     # start ftp server
     server.serve_forever()
